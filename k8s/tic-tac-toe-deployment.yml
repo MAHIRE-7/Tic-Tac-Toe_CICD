@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tic-tac-toe-containers
-          image: manodayahire/tic-tac-toe-game
+          image: manodayahire/tic-tac-toe-app:21
           ports:
             - containerPort: 3000
           
