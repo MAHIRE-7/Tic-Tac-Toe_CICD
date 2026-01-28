@@ -3,20 +3,135 @@
 <head>
     <title>Tic-Tac-Toe</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        .game-board { display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 5px; margin: 20px auto; width: 310px; }
-        .cell { width: 100px; height: 100px; border: 2px solid #333; background: #f0f0f0; font-size: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .cell:hover { background: #e0e0e0; }
-        .cell.disabled { cursor: not-allowed; }
-        .status { font-size: 24px; margin: 20px; }
-        button { padding: 10px 20px; font-size: 16px; margin: 10px; cursor: pointer; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.2); }
+            to { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.4); }
+        }
+        .game-board { 
+            display: grid; 
+            grid-template-columns: repeat(3, 120px); 
+            grid-gap: 10px; 
+            margin: 30px auto; 
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+        .cell { 
+            width: 120px; 
+            height: 120px; 
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 48px; 
+            font-weight: bold;
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        .cell:hover::before {
+            left: 100%;
+        }
+        .cell:hover { 
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 1);
+        }
+        .cell.disabled { cursor: not-allowed; opacity: 0.7; }
+        .cell.winner {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            animation: winner-pulse 0.6s ease-in-out;
+        }
+        @keyframes winner-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .status { 
+            font-size: 28px; 
+            margin: 20px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        button { 
+            padding: 15px 30px; 
+            font-size: 18px; 
+            margin: 20px; 
+            cursor: pointer;
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #FF8E53, #FF6B6B);
+        }
+        button:active {
+            transform: translateY(-1px);
+        }
+        .player-x { color: #FF6B6B; }
+        .player-o { color: #4ECDC4; }
     </style>
 </head>
 <body>
-    <h1>🎮 Tic-Tac-Toe on K8s</h1>
-    <div class="status" id="status">Player X's turn</div>
-    <div class="game-board" id="board"></div>
-    <button onclick="resetGame()">New Game</button>
+    <div class="container">
+        <h1>🎮 Tic-Tac-Toe on K8s</h1>
+        <div class="status" id="status">Player <span class="player-x">X</span>'s turn</div>
+        <div class="game-board" id="board"></div>
+        <button onclick="resetGame()">New Game</button>
+    </div>
 
     <script>
         let board = ['', '', '', '', '', '', '', '', ''];
@@ -48,7 +163,9 @@
             updateDisplay();
             
             if (checkWinner()) {
-                document.getElementById('status').textContent = `Player ${currentPlayer} wins! 🎉`;
+                highlightWinner();
+                const playerClass = currentPlayer === 'X' ? 'player-x' : 'player-o';
+                document.getElementById('status').innerHTML = `Player <span class="${playerClass}">${currentPlayer}</span> wins! 🎉`;
                 gameActive = false;
                 return;
             }
@@ -60,7 +177,8 @@
             }
             
             currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            document.getElementById('status').textContent = `Player ${currentPlayer}'s turn`;
+            const playerClass = currentPlayer === 'X' ? 'player-x' : 'player-o';
+            document.getElementById('status').innerHTML = `Player <span class="${playerClass}">${currentPlayer}</span>'s turn`;
         }
 
         function checkWinner() {
@@ -74,6 +192,22 @@
             cells.forEach((cell, index) => {
                 cell.textContent = board[index];
                 cell.className = gameActive ? 'cell' : 'cell disabled';
+                if (board[index] === 'X') {
+                    cell.style.color = '#FF6B6B';
+                } else if (board[index] === 'O') {
+                    cell.style.color = '#4ECDC4';
+                }
+            });
+        }
+        
+        function highlightWinner() {
+            const cells = document.querySelectorAll('.cell');
+            winningConditions.forEach(condition => {
+                if (condition.every(index => board[index] === currentPlayer)) {
+                    condition.forEach(index => {
+                        cells[index].classList.add('winner');
+                    });
+                }
             });
         }
 
@@ -81,7 +215,12 @@
             board = ['', '', '', '', '', '', '', '', ''];
             currentPlayer = 'X';
             gameActive = true;
-            document.getElementById('status').textContent = "Player X's turn";
+            document.getElementById('status').innerHTML = 'Player <span class="player-x">X</span>\'s turn';
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.classList.remove('winner');
+                cell.style.color = '#333';
+            });
             updateDisplay();
         }
 
